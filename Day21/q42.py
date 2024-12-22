@@ -3,7 +3,7 @@ Author: Rohan Mitra (rohan.mitra@dubizzle.com)
 q41.py (c) 2024
 Desc: description
 Created:  2024-12-21T12:15:23.008Z
-Modified: 2024-12-21T23:48:31.988Z
+Modified: 2024-12-22T00:02:31.429Z
 """
 
 from time import time
@@ -171,21 +171,23 @@ def min_cost(seq, depth):
         return len(seq)
 
     subseqs = shortest_paths_to_code(0, 2, seq, is_numeric=False)
+    #subseqs is a list of lists where subseqs[i] is a list of the valid shortest paths between the i-1 and ith characters
+    #eg: if code was 297A then subseqs=[[shortest paths from A to 2],[shortest paths from 2 to 9],[shortest paths from 9 to 7],[shortest paths from 7 to A]]
 
     cost = 0
     for sseq in subseqs:
+        #For each of the shortest paths from i-1 to i, find the minimum cost going through all 25 robots
+        #Cache results across all pairs of paths (A-2,2-9,9-7,7-A) since its one function
         cost += min([min_cost(s, depth - 1) for s in sseq])
     return cost
 
 
 def get_directions(code):
-    ans_last_seqs = shortest_paths_to_code(3, 2, code, is_numeric=True)
-    print(ans_last_seqs)
-    depth = 25
-
+    keypad_sequences = shortest_paths_to_code(3, 2, code, is_numeric=True)
+    print(keypad_sequences)
     ans = 0
-    for seqs in ans_last_seqs:
-        ans += min([min_cost(seq, depth) for seq in seqs])
+    for seqs in keypad_sequences:
+        ans += min([min_cost(seq, 25) for seq in seqs])
     return ans
 
 
@@ -195,7 +197,7 @@ with open("input.txt", "r") as f:
     for line in f.readlines():
         code = line.strip()
         print(code)
-        # Call function to get the directions
+        # Call function to get the length of directions
         shortest_directions = get_directions(code)
 
         # Calculate complexity
